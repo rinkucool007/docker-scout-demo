@@ -1,0 +1,39 @@
+name: Build and Scan Docker Image with Docker Scout
+
+on:
+  push:                           # Trigger workflow on any branch push
+    branches:
+      - '**'                      # Listen for pushes on all branches
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Check Docker Scout
+        run: |
+          docker scout
+        
+
+      - name: Build and tag the Docker image
+        run: |
+          docker build -t app .
+
+      - name: Docker Scout
+        id: docker-scout
+        uses: docker/scout-action@v1
+        with:
+          command: cves,recommendations,compare
+          to-latest: true
+          ignore-base: true
+          ignore-unchanged: true
+          only-fixed: true
+
+      - name: Upload scan report
+        uses: actions/upload-artifact@v3
+        with:
+          name: scout-report
+          path: scout-report.txt
