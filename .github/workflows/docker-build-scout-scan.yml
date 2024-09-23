@@ -1,9 +1,12 @@
-name: Build and Scan Docker Image with Docker Scout
+name: Build and Scan Docker Image with Docker Scan
 
 on:
   push:
     branches:
       - '**'                      # Trigger workflow on any branch
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   build-and-scan:
@@ -20,14 +23,12 @@ jobs:
         run: |
           docker buildx build --tag my-app:${{ github.sha }} --load .
 
-      # Use Docker Scout Action to scan the locally built Docker image
-      - name: Scan the Docker image with Docker Scout
-        uses: docker/scout-action@v1
-        with:
-          image: my-app:${{ github.sha }}
+      - name: Scan the Docker image using Docker Scan (Snyk)
+        run: |
+          docker scan my-app:${{ github.sha }}
 
       - name: Upload scan report
         uses: actions/upload-artifact@v3
         with:
-          name: scout-report
-          path: scout-report.txt
+          name: scan-report
+          path: scan-report.txt
