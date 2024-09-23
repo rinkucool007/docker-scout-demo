@@ -1,4 +1,4 @@
-name: Build and Scan Docker Image with Docker Scan
+name: Build and Scan Docker Image with Trivy
 
 on:
   push:
@@ -23,12 +23,17 @@ jobs:
         run: |
           docker buildx build --tag my-app:${{ github.sha }} --load .
 
-      - name: Scan the Docker image using Docker Scan (Snyk)
+      - name: Install Trivy
         run: |
-          docker scan my-app:${{ github.sha }}
+          sudo apt-get update
+          sudo apt-get install -y trivy
 
-      - name: Upload scan report
+      - name: Scan the Docker image using Trivy
+        run: |
+          trivy image --format table --output trivy-scan-report.txt my-app:${{ github.sha }}
+
+      - name: Upload Trivy scan report
         uses: actions/upload-artifact@v3
         with:
-          name: scan-report
-          path: scan-report.txt
+          name: trivy-scan-report
+          path: trivy-scan-report.txt
