@@ -25,8 +25,8 @@ jobs:
 
       - name: Install Docker Scout CLI
         run: |
-          DOCKER_SCOUT_VERSION=0.11.0
-          curl -fsSL https://github.com/docker/scout-cli/releases/download/v${DOCKER_SCOUT_VERSION}/docker-scout_${DOCKER_SCOUT_VERSION}_linux_amd64.tar.gz -o scout.tar.gz
+          DOCKER_SCOUT_VERSION=1.13.0
+          curl -fsSL curl -fsSL https://github.com/docker/scout-cli/releases/download/v${DOCKER_SCOUT_VERSION}/docker-scout_${DOCKER_SCOUT_VERSION}_linux_amd64.tar.gz -o scout.tar.gz
           tar -xzvf scout.tar.gz
           mv docker-scout /usr/local/bin/
 
