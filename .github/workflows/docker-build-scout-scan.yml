@@ -1,9 +1,12 @@
-name: Build and Scan Docker Image with Docker Scout
+name: Build and Scan Docker Image with Docker Scout (No Docker Hub)
 
 on:
   push:                           # Trigger workflow on any branch push
     branches:
       - '**'                      # Listen for pushes on all branches
+  pull_request:                    # Trigger workflow on any pull request
+    branches:
+      - '**'
 
 jobs:
   build-and-scan:
@@ -12,20 +15,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      - name: Build and tag the Docker image
-        run: |
-          docker build -t app .
 
-      - name: Docker Scout
-        id: docker-scout
-        uses: docker/scout-action@v1
-        with:
-          command: cves,recommendations,compare
-          to-latest: true
-          ignore-base: true
-          ignore-unchanged: true
-          only-fixed: true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build the Docker image locally
+        run: |
+          docker build -t my-app .
+
+      - name: Install Docker Scout CLI
+        run: |
+          DOCKER_SCOUT_VERSION=0.11.0
+          curl -fsSL https://github.com/docker/scout-cli/releases/download/v${DOCKER_SCOUT_VERSION}/docker-scout_${DOCKER_SCOUT_VERSION}_linux_amd64.tar.gz -o scout.tar.gz
+          tar -xzvf scout.tar.gz
+          mv docker-scout /usr/local/bin/
+
+      - name: Scan the locally built Docker image with Docker Scout
+        run: |
+          docker scout cves my-app
 
       - name: Upload scan report
         uses: actions/upload-artifact@v3
