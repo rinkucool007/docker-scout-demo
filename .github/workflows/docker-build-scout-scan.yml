@@ -44,7 +44,7 @@ jobs:
 
       - name: Generate html format
         run: |
-          trivy repo --format template --template "@html.tpl" -o report.html
+          trivy repo --format template --template "@html.tpl" -o report.html .
         continue-on-error: true
         
       - name: Upload Trivy SBOM
@@ -56,7 +56,7 @@ jobs:
       - name: Upload HTML
         uses: actions/upload-artifact@v3
         with:
-          name: html
+          name: trivy-html-report
           path: report.html
           
           
