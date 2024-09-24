@@ -44,7 +44,8 @@ jobs:
 
       - name: Generate html format
         run: |
-          trivy repo --format template --template "@html.tpl" -o report.html .
+          # trivy repo --format template --template "@html.tpl" -o report.html .
+          trivy image --format template --template "@html.tpl" --output report.html my-app
         continue-on-error: true
         
       - name: Upload Trivy SBOM
