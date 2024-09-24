@@ -3,7 +3,7 @@ name: Build and Scan Docker Image with Trivy
 on:
   push:
     branches:
-      - '**'                      # Trigger workflow on any branch
+      - '**'                     
   pull_request:
     branches:
       - '**'
@@ -36,7 +36,18 @@ jobs:
         run: |
           trivy image my-app:${{ github.sha }}
           trivy image --format table --output trivy-scan-report.txt my-app:${{ github.sha }}
+          
+      - name: Generate SBOM in CycloneDX format
+        run: |
+          trivy image --format cyclonedx --output sbom.xml docker.io/my-organization/my-app:${{ github.sha }}
+        continue-on-error: true  # Bypass failure in SBOM generation
 
+      - name: Upload Trivy SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom
+          path: sbom.xml
+          
       - name: Upload Trivy scan report
         uses: actions/upload-artifact@v3
         with:
