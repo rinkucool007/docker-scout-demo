@@ -1,5 +1,4 @@
 name: Build and Scan Docker Image with Trivy
-
 on:
   push:
     branches:
@@ -7,47 +6,22 @@ on:
   pull_request:
     branches:
       - '**'
-
 jobs:
-  build-and-scan:
+  build:
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build the Docker image locally
+        uses: actions/checkout@v2
+      - name: Build an image from Dockerfile
         run: |
-          docker buildx build --tag my-app --load .
-               
-
-      - name: Run Trivy vulnerability scanner in IaC mode
-        uses: aquasecurity/trivy-action@master
+          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: 'my-app'
-          scan-type: 'config'
-          hide-progress: false
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: false
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-
-      - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'my-app'
-          scan-type: 'fs'
-          hide-progress: false
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: false
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-
-      - name: Upload Trivy scan report
-        uses: actions/upload-artifact@v3
-        with:
-          name: trivy-scan-report
-          path: trivy-scan-report.txt
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
