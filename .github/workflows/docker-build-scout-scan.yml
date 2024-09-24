@@ -24,14 +24,14 @@ jobs:
           docker buildx build --tag my-app:${{ github.sha }} --load .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: 'my-app:${{ github.sha }}'
-          format: 'json'
+          format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'MEDIUM'
+          severity: 'CRITICAL,HIGH,MEDIUM'
 
       - name: Upload Trivy scan report
         uses: actions/upload-artifact@v3
