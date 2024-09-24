@@ -22,9 +22,12 @@ jobs:
       - name: Build the Docker image locally
         run: |
           docker buildx build --tag my-app:${{ github.sha }} --load .
-
+   
+      - name: List Docker images
+        run: docker images
+        
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.20.0
+        uses: aquasecurity/trivy-action@v0.31.3
         with:
           image-ref: 'my-app:${{ github.sha }}'
           format: 'table'
