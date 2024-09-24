@@ -2,7 +2,7 @@ name: Build and Scan Docker Image with Trivy
 on:
   push:
     branches:
-      - '**'                      # Trigger workflow on any branch
+      - '**'                    
   pull_request:
     branches:
       - '**'
@@ -24,4 +24,9 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+      - name: Upload Trivy scan report
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-scan-report
+          path: trivy-scan-report.txt
