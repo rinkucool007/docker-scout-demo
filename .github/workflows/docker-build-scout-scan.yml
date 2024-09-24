@@ -21,7 +21,7 @@ jobs:
 
       - name: Build the Docker image locally
         run: |
-          docker buildx build --tag my-app:${{ github.sha }} --load .
+          docker buildx build --tag my-app --load .
 
       - name: Install Trivy
         run: |
@@ -34,12 +34,12 @@ jobs:
 
       - name: Scan the Docker image using Trivy
         run: |
-          trivy image my-app:${{ github.sha }}
-          trivy image --format table --output trivy-scan-report.txt my-app:${{ github.sha }}
+          trivy image my-app
+          trivy image --format table --output trivy-scan-report.txt my-app
           
       - name: Generate SBOM in CycloneDX format
         run: |
-          trivy image --format cyclonedx --output sbom.xml docker.io/my-organization/my-app:${{ github.sha }}
+          trivy image --format cyclonedx --output sbom.xml my-app
         continue-on-error: true  # Bypass failure in SBOM generation
 
       - name: Upload Trivy SBOM
